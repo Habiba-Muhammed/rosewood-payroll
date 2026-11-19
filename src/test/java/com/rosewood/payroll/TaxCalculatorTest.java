@@ -7,6 +7,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class TaxCalculatorTest {
 
@@ -160,6 +162,27 @@ class TaxCalculatorTest {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> calculator.calculateTax(Double.NaN)
+        );
+    }
+
+    @Test
+    void rejectsTaxAmountGreaterThanGrossPay() {
+
+        TaxRule taxRule = mock(TaxRule.class);
+
+        when(taxRule.appliesTo(800.0))
+                .thenReturn(true);
+
+        when(taxRule.calculateTax(800.0))
+                .thenReturn(900.0);
+
+        TaxCalculator calculator = new TaxCalculator(
+                List.of(taxRule)
+        );
+
+        assertThrows(
+                IllegalStateException.class,
+                () -> calculator.calculateTax(800.0)
         );
     }
 }
