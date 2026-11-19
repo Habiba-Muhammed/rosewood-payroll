@@ -6,7 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class PayrollCalculatorCharacterizationTest {
     @Test
     void shouldCalculateNetPayForRegularHours() {
-        PayrollCalculator calculator = new PayrollCalculator();
+        EmployeeRepository repository = new InMemoryEmployeeRepository();
+        PayrollCalculator calculator = new PayrollCalculator(repository);
 
         double netPay = calculator.calculateNetPay("e1", 40, 20);
 
@@ -15,7 +16,8 @@ public class PayrollCalculatorCharacterizationTest {
 
     @Test
     void shouldCalculateNetPayWithOvertime() {
-        PayrollCalculator calculator = new PayrollCalculator();
+        EmployeeRepository repository = new InMemoryEmployeeRepository();
+        PayrollCalculator calculator = new PayrollCalculator(repository);
 
         double netPay = calculator.calculateNetPay("e2", 50, 30);
 
