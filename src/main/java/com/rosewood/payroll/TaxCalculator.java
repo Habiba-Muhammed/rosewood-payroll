@@ -9,7 +9,10 @@ public class TaxCalculator {
     private final List<TaxRule> taxRules;
 
     public TaxCalculator(List<TaxRule> taxRules) {
-        Objects.requireNonNull(taxRules, "Tax rules cannot be null");
+        Objects.requireNonNull(
+                taxRules,
+                "Tax rules cannot be null"
+        );
 
         if (taxRules.isEmpty()) {
             throw new IllegalArgumentException(
@@ -21,14 +24,46 @@ public class TaxCalculator {
     }
 
     public double calculateTax(double grossPay) {
+
+        if (!Double.isFinite(grossPay) || grossPay < 0) {
+            throw new IllegalArgumentException(
+                    "Gross pay must be a finite, non-negative number"
+            );
+        }
+
+        TaxRule matchingRule = null;
+
         for (TaxRule taxRule : taxRules) {
             if (taxRule.appliesTo(grossPay)) {
-                return taxRule.calculateTax(grossPay);
+
+                if (matchingRule != null) {
+                    throw new IllegalStateException(
+                            "Multiple tax rules apply to gross pay: "
+                                    + grossPay
+                    );
+                }
+
+                matchingRule = taxRule;
             }
         }
 
-        throw new IllegalArgumentException(
-                "No tax rule applies to gross pay: " + grossPay
-        );
+        if (matchingRule == null) {
+            throw new IllegalStateException(
+                    "No tax rule applies to gross pay: " + grossPay
+            );
+        }
+
+        double taxAmount = matchingRule.calculateTax(grossPay);
+
+        if (!Double.isFinite(taxAmount)
+                || taxAmount < 0
+                || taxAmount > grossPay) {
+
+            throw new IllegalStateException(
+                    "Invalid tax amount calculated: " + taxAmount
+            );
+        }
+
+        return taxAmount;
     }
 }
