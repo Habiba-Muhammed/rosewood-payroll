@@ -1,45 +1,61 @@
+
 package com.rosewood.payroll;
 
 import java.util.Objects;
 
 public class PayrollCalculator {
 
-    private final EmployeeRepository repository;
+    private final EmployeeRepository employeeRepository;
+    private final GrossPayCalculator grossPayCalculator;
 
-    public PayrollCalculator(EmployeeRepository repository) {
-        this.repository = Objects.requireNonNull(
-                repository,
+    public PayrollCalculator(
+            EmployeeRepository employeeRepository,
+            GrossPayCalculator grossPayCalculator) {
+
+        this.employeeRepository = Objects.requireNonNull(
+                employeeRepository,
                 "Employee repository cannot be null"
+        );
+
+        this.grossPayCalculator = Objects.requireNonNull(
+                grossPayCalculator,
+                "Gross pay calculator cannot be null"
         );
     }
 
-    public double calculateNetPay(String employeeId, double hoursWorked, double hourlyRate) {
+    public double calculateNetPay(
+            String employeeId,
+            double hoursWorked,
+            double hourlyRate) {
+
         try {
-        Employee employee = repository.findById(employeeId);
+            Employee employee = employeeRepository.findById(employeeId);
 
-        double gross = hoursWorked * hourlyRate;
+            double grossPay = grossPayCalculator.calculate(
+                    hoursWorked,
+                    hourlyRate
+            );
 
-        // overtime: extra hours beyond 40 are paid at time-and-a-half
-        if (hoursWorked > 40) {
-            gross = gross + (hoursWorked - 40) * hourlyRate * 0.5;
+            double taxRate;
+
+            if (grossPay < 1000) {
+                taxRate = 0.05;
+            } else if (grossPay < 5000) {
+                taxRate = 0.15;
+            } else {
+                taxRate = 0.25;
+            }
+
+            double netPay = grossPay - (grossPay * taxRate);
+
+            System.out.println(
+                    "Net pay for " + employee.getName() + ": GHS " + netPay
+            );
+
+            return netPay;
+
+        } catch (Exception exception) {
+            return 0;
         }
-
-        // tax band, worked out from gross pay
-        double taxRate;
-        if (gross < 1000) {
-            taxRate = 0.05;      // LOW
-        } else if (gross < 5000) {
-            taxRate = 0.15;      // MEDIUM
-        } else {
-            taxRate = 0.25;      // HIGH
-        }
-
-        double net = gross - (gross * taxRate);
-        System.out.println("Net pay for " + employee.getName() + ": GHS " + net);
-        return net;
-    } catch (Exception e) {
-        // something went wrong (for example the employee was not found) - return zero
-        return 0;
     }
- }
 }
