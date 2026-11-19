@@ -4,6 +4,7 @@ package com.rosewood.payroll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class GrossPayCalculatorTest {
 
@@ -56,4 +57,56 @@ class GrossPayCalculatorTest {
 
         assertEquals(0.0, grossPay, 0.001);
     }
+
+
+    @Test
+    void rejectsNegativeHours() {
+        GrossPayCalculator calculator = new GrossPayCalculator();
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> calculator.calculate(-10, 20)
+        );
+    }
+
+    @Test
+    void rejectsNegativeHourlyRate() {
+        GrossPayCalculator calculator = new GrossPayCalculator();
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> calculator.calculate(40, -20)
+        );
+    }
+
+    @Test
+    void rejectsNaNHours() {
+        GrossPayCalculator calculator = new GrossPayCalculator();
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> calculator.calculate(Double.NaN, 20)
+        );
+    }
+
+    @Test
+    void rejectsInfiniteHourlyRate() {
+        GrossPayCalculator calculator = new GrossPayCalculator();
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> calculator.calculate(40, Double.POSITIVE_INFINITY)
+        );
+    }
+
+    @Test
+    void rejectsGrossPayOverflow() {
+        GrossPayCalculator calculator = new GrossPayCalculator();
+
+        assertThrows(
+                ArithmeticException.class,
+                () -> calculator.calculate(Double.MAX_VALUE, 20)
+        );
+    }
+
 }

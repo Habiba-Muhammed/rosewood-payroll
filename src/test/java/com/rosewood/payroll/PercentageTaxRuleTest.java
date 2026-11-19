@@ -43,4 +43,46 @@ class PercentageTaxRuleTest {
 
         assertEquals(247.50, taxAmount, 0.001);
     }
+
+
+    @Test
+    void rejectsReversedTaxBandBoundaries() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new PercentageTaxRule(5000, 1000, 0.15)
+        );
+    }
+
+    @Test
+    void rejectsEqualTaxBandBoundaries() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new PercentageTaxRule(1000, 1000, 0.15)
+        );
+    }
+
+    @Test
+    void rejectsNegativeTaxRate() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new PercentageTaxRule(1000, 5000, -0.05)
+        );
+    }
+
+    @Test
+    void rejectsTaxRateGreaterThanOne() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new PercentageTaxRule(1000, 5000, 1.5)
+        );
+    }
+
+    @Test
+    void rejectsNaNTaxRate() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new PercentageTaxRule(1000, 5000, Double.NaN)
+        );
+    }
+
 }

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PayrollCalculatorTest {
 
@@ -40,6 +41,34 @@ class PayrollCalculatorTest {
 
         assertEquals(831.25, netPay, 0.001);
     }
+
+
+    @Test
+    void throwsExceptionWhenEmployeeIsNotFound() {
+        PayrollCalculator calculator = createCalculator();
+
+        EmployeeNotFoundException exception = assertThrows(
+                EmployeeNotFoundException.class,
+                () -> calculator.calculateNetPay("unknown", 40, 20)
+        );
+
+        assertEquals(
+                "Employee not found: unknown",
+                exception.getMessage()
+        );
+    }
+
+    @Test
+    void throwsEmployeeNotFoundExceptionWhenEmployeeAndHoursAreInvalid() {
+
+        PayrollCalculator calculator = createCalculator();
+
+        assertThrows(
+                EmployeeNotFoundException.class,
+                () -> calculator.calculateNetPay("unknown", -10, 20)
+        );
+    }
+
 
     private PayrollCalculator createCalculator() {
         EmployeeRepository employeeRepository =

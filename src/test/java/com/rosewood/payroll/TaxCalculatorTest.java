@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TaxCalculatorTest {
 
@@ -92,6 +93,73 @@ class TaxCalculatorTest {
                                 5000, Double.POSITIVE_INFINITY, 0.25
                         )
                 )
+        );
+    }
+
+    @Test
+    void rejectsEmptyTaxRules() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new TaxCalculator(List.of())
+        );
+    }
+
+    @Test
+    void throwsExceptionWhenNoTaxRuleMatches() {
+        TaxCalculator calculator = new TaxCalculator(
+                List.of(
+                        new PercentageTaxRule(0, 1000, 0.05)
+                )
+        );
+
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> calculator.calculateTax(1500)
+        );
+
+        assertEquals(
+                "No tax rule applies to gross pay: 1500.0",
+                exception.getMessage()
+        );
+    }
+
+    @Test
+    void throwsExceptionWhenTaxRulesOverlap() {
+        TaxCalculator calculator = new TaxCalculator(
+                List.of(
+                        new PercentageTaxRule(0, 2000, 0.05),
+                        new PercentageTaxRule(1000, 5000, 0.15)
+                )
+        );
+
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> calculator.calculateTax(1500)
+        );
+
+        assertEquals(
+                "Multiple tax rules apply to gross pay: 1500.0",
+                exception.getMessage()
+        );
+    }
+
+    @Test
+    void rejectsNegativeGrossPay() {
+        TaxCalculator calculator = createCalculator();
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> calculator.calculateTax(-100)
+        );
+    }
+
+    @Test
+    void rejectsNaNGrossPay() {
+        TaxCalculator calculator = createCalculator();
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> calculator.calculateTax(Double.NaN)
         );
     }
 }
