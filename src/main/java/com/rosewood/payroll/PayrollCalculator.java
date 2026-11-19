@@ -35,13 +35,11 @@ public class PayrollCalculator {
             double hoursWorked,
             double hourlyRate) {
 
-        try {
+
             Employee employee = employeeRepository.findById(employeeId);
 
             if (employee == null) {
-                throw new IllegalArgumentException(
-                        "Employee not found: " + employeeId
-                );
+                throw new EmployeeNotFoundException(employeeId);
             }
 
             double grossPay = grossPayCalculator.calculate(
@@ -52,9 +50,5 @@ public class PayrollCalculator {
             double taxAmount = taxCalculator.calculateTax(grossPay);
 
             return grossPay - taxAmount;
-
-        } catch (Exception exception) {
-            return 0;
         }
     }
-}
