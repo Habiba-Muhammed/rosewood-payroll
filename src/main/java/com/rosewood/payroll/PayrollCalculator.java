@@ -7,10 +7,12 @@ public class PayrollCalculator {
 
     private final EmployeeRepository employeeRepository;
     private final GrossPayCalculator grossPayCalculator;
+    private final TaxCalculator taxCalculator;
 
     public PayrollCalculator(
             EmployeeRepository employeeRepository,
-            GrossPayCalculator grossPayCalculator) {
+            GrossPayCalculator grossPayCalculator,
+            TaxCalculator taxCalculator) {
 
         this.employeeRepository = Objects.requireNonNull(
                 employeeRepository,
@@ -20,6 +22,11 @@ public class PayrollCalculator {
         this.grossPayCalculator = Objects.requireNonNull(
                 grossPayCalculator,
                 "Gross pay calculator cannot be null"
+        );
+
+        this.taxCalculator = Objects.requireNonNull(
+                taxCalculator,
+                "Tax calculator cannot be null"
         );
     }
 
@@ -38,15 +45,8 @@ public class PayrollCalculator {
 
             double taxRate;
 
-            if (grossPay < 1000) {
-                taxRate = 0.05;
-            } else if (grossPay < 5000) {
-                taxRate = 0.15;
-            } else {
-                taxRate = 0.25;
-            }
-
-            double netPay = grossPay - (grossPay * taxRate);
+            double taxAmount = taxCalculator.calculateTax(grossPay);
+            double netPay = grossPay - taxAmount;
 
             System.out.println(
                     "Net pay for " + employee.getName() + ": GHS " + netPay
