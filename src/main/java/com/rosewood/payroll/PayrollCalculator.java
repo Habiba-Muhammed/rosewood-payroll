@@ -38,21 +38,20 @@ public class PayrollCalculator {
         try {
             Employee employee = employeeRepository.findById(employeeId);
 
+            if (employee == null) {
+                throw new IllegalArgumentException(
+                        "Employee not found: " + employeeId
+                );
+            }
+
             double grossPay = grossPayCalculator.calculate(
                     hoursWorked,
                     hourlyRate
             );
 
-            double taxRate;
-
             double taxAmount = taxCalculator.calculateTax(grossPay);
-            double netPay = grossPay - taxAmount;
 
-            System.out.println(
-                    "Net pay for " + employee.getName() + ": GHS " + netPay
-            );
-
-            return netPay;
+            return grossPay - taxAmount;
 
         } catch (Exception exception) {
             return 0;
