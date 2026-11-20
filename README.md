@@ -126,7 +126,7 @@ This reduces the risk of incorrect tax deductions when Rosewood introduces new t
 
 The project includes the following supporting documents:
 
-- [Analysis Check-In](Analyis.md) — Identified code smells, SOLID violations, AI-generated test weaknesses, and their severity.
+- [Analysis Check-In](Analysis.md) — Identified code smells, SOLID violations, AI-generated test weaknesses, and their severity.
 - [Refactoring Rationale](RATIONALE.md) — Explains architectural decisions, exception handling, tax extensibility, test improvements, and remaining limitations.
 
 ## Known Limitations
