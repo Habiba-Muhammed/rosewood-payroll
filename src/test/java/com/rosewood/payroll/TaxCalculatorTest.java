@@ -185,4 +185,38 @@ class TaxCalculatorTest {
                 () -> calculator.calculateTax(800.0)
         );
     }
+
+    @Test
+    void rejectsNegativeCalculatedTax() {
+        TaxRule taxRule = mock(TaxRule.class);
+
+        when(taxRule.appliesTo(800.0)).thenReturn(true);
+        when(taxRule.calculateTax(800.0)).thenReturn(-10.0);
+
+        TaxCalculator calculator = new TaxCalculator(
+                List.of(taxRule)
+        );
+
+        assertThrows(
+                IllegalStateException.class,
+                () -> calculator.calculateTax(800.0)
+        );
+    }
+
+    @Test
+    void rejectsNaNCalculatedTax() {
+        TaxRule taxRule = mock(TaxRule.class);
+
+        when(taxRule.appliesTo(800.0)).thenReturn(true);
+        when(taxRule.calculateTax(800.0)).thenReturn(Double.NaN);
+
+        TaxCalculator calculator = new TaxCalculator(
+                List.of(taxRule)
+        );
+
+        assertThrows(
+                IllegalStateException.class,
+                () -> calculator.calculateTax(800.0)
+        );
+    }
 }

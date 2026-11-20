@@ -85,4 +85,25 @@ class PercentageTaxRuleTest {
         );
     }
 
+    @Test
+    void rejectsNaNMinimumGrossPay() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new PercentageTaxRule(
+                        Double.NaN, 1000, 0.05
+                )
+        );
+    }
+
+    @Test
+    void rejectsNaNMaximumGrossPay() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new PercentageTaxRule(
+                        0, Double.NaN, 0.05
+                )
+        );
+    }
+
+
 }
