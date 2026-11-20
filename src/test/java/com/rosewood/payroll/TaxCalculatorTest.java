@@ -3,6 +3,7 @@ package com.rosewood.payroll;
 
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -14,7 +15,6 @@ class TaxCalculatorTest {
 
     @Test
     void calculatesTaxForLowBand() {
-
         TaxCalculator calculator = createCalculator();
 
         double taxAmount = calculator.calculateTax(800);
@@ -24,7 +24,6 @@ class TaxCalculatorTest {
 
     @Test
     void calculatesTaxJustBelowMediumBand() {
-
         TaxCalculator calculator = createCalculator();
 
         double taxAmount = calculator.calculateTax(999);
@@ -34,7 +33,6 @@ class TaxCalculatorTest {
 
     @Test
     void calculatesTaxAtMediumBandBoundary() {
-
         TaxCalculator calculator = createCalculator();
 
         double taxAmount = calculator.calculateTax(1000);
@@ -44,7 +42,6 @@ class TaxCalculatorTest {
 
     @Test
     void calculatesTaxForMediumBand() {
-
         TaxCalculator calculator = createCalculator();
 
         double taxAmount = calculator.calculateTax(1650);
@@ -54,7 +51,6 @@ class TaxCalculatorTest {
 
     @Test
     void calculatesTaxJustBelowHighBand() {
-
         TaxCalculator calculator = createCalculator();
 
         double taxAmount = calculator.calculateTax(4999);
@@ -64,7 +60,6 @@ class TaxCalculatorTest {
 
     @Test
     void calculatesTaxAtHighBandBoundary() {
-
         TaxCalculator calculator = createCalculator();
 
         double taxAmount = calculator.calculateTax(5000);
@@ -74,7 +69,6 @@ class TaxCalculatorTest {
 
     @Test
     void calculatesTaxAboveHighBand() {
-
         TaxCalculator calculator = createCalculator();
 
         double taxAmount = calculator.calculateTax(6000);
@@ -82,9 +76,12 @@ class TaxCalculatorTest {
         assertEquals(1500.0, taxAmount, 0.001);
     }
 
+    private TaxCalculator createCalculator() {
+        return PayrollTestFixtures.createTaxCalculator();
+    }
+
     @Test
     void rejectsEmptyTaxRules() {
-
         assertThrows(
                 IllegalArgumentException.class,
                 () -> new TaxCalculator(List.of())
@@ -93,7 +90,6 @@ class TaxCalculatorTest {
 
     @Test
     void throwsExceptionWhenNoTaxRuleMatches() {
-
         TaxCalculator calculator = new TaxCalculator(
                 List.of(
                         new PercentageTaxRule(0, 1000, 0.05)
@@ -113,7 +109,6 @@ class TaxCalculatorTest {
 
     @Test
     void throwsExceptionWhenTaxRulesOverlap() {
-
         TaxCalculator calculator = new TaxCalculator(
                 List.of(
                         new PercentageTaxRule(0, 2000, 0.05),
@@ -134,7 +129,6 @@ class TaxCalculatorTest {
 
     @Test
     void rejectsNegativeGrossPay() {
-
         TaxCalculator calculator = createCalculator();
 
         assertThrows(
@@ -145,7 +139,6 @@ class TaxCalculatorTest {
 
     @Test
     void rejectsNaNGrossPay() {
-
         TaxCalculator calculator = createCalculator();
 
         assertThrows(
@@ -156,7 +149,6 @@ class TaxCalculatorTest {
 
     @Test
     void rejectsTaxAmountGreaterThanGrossPay() {
-
         TaxRule taxRule = mock(TaxRule.class);
 
         when(taxRule.appliesTo(800.0)).thenReturn(true);
@@ -174,7 +166,6 @@ class TaxCalculatorTest {
 
     @Test
     void rejectsNegativeCalculatedTax() {
-
         TaxRule taxRule = mock(TaxRule.class);
 
         when(taxRule.appliesTo(800.0)).thenReturn(true);
@@ -192,7 +183,6 @@ class TaxCalculatorTest {
 
     @Test
     void rejectsNaNCalculatedTax() {
-
         TaxRule taxRule = mock(TaxRule.class);
 
         when(taxRule.appliesTo(800.0)).thenReturn(true);
@@ -210,7 +200,6 @@ class TaxCalculatorTest {
 
     @Test
     void acceptsZeroGrossPay() {
-
         TaxCalculator calculator = createCalculator();
 
         double taxAmount = calculator.calculateTax(0);
@@ -220,7 +209,6 @@ class TaxCalculatorTest {
 
     @Test
     void acceptsZeroPercentTaxRate() {
-
         TaxCalculator calculator = new TaxCalculator(
                 List.of(
                         new PercentageTaxRule(
@@ -236,7 +224,6 @@ class TaxCalculatorTest {
 
     @Test
     void acceptsHundredPercentTaxRate() {
-
         TaxCalculator calculator = new TaxCalculator(
                 List.of(
                         new PercentageTaxRule(
@@ -250,7 +237,136 @@ class TaxCalculatorTest {
         assertEquals(800.0, taxAmount, 0.001);
     }
 
-    private TaxCalculator createCalculator() {
-        return PayrollTestFixtures.createTaxCalculator();
+
+    @Test
+    void rejectsNullDecimalGrossPay() {
+        TaxCalculator calculator = createCalculator();
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> calculator.calculateTax((BigDecimal) null)
+        );
+    }
+
+    @Test
+    void rejectsNegativeDecimalGrossPay() {
+        TaxCalculator calculator = createCalculator();
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> calculator.calculateTax(new BigDecimal("-0.01"))
+        );
+    }
+
+    @Test
+    void throwsExceptionWhenNoDecimalTaxRuleMatches() {
+        TaxCalculator calculator = new TaxCalculator(
+                List.of(new PercentageTaxRule(
+                        new BigDecimal("0"),
+                        new BigDecimal("1000"),
+                        new BigDecimal("0.05")
+                ))
+        );
+
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> calculator.calculateTax(new BigDecimal("1500"))
+        );
+
+        assertEquals(
+                "No tax rule applies to gross pay: 1500",
+                exception.getMessage()
+        );
+    }
+
+    @Test
+    void throwsExceptionWhenDecimalTaxRulesOverlap() {
+        TaxCalculator calculator = new TaxCalculator(
+                List.of(
+                        new PercentageTaxRule(
+                                new BigDecimal("0"),
+                                new BigDecimal("2000"),
+                                new BigDecimal("0.05")
+                        ),
+                        new PercentageTaxRule(
+                                new BigDecimal("1000"),
+                                new BigDecimal("5000"),
+                                new BigDecimal("0.15")
+                        )
+                )
+        );
+
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> calculator.calculateTax(new BigDecimal("1500"))
+        );
+
+        assertEquals(
+                "Multiple tax rules apply to gross pay: 1500",
+                exception.getMessage()
+        );
+    }
+
+    @Test
+    void rejectsNullCalculatedDecimalTax() {
+        BigDecimal grossPay = new BigDecimal("800.00");
+
+        TaxRule taxRule = mock(TaxRule.class);
+
+        when(taxRule.appliesTo(grossPay)).thenReturn(true);
+        when(taxRule.calculateTax(grossPay)).thenReturn(null);
+
+        TaxCalculator calculator = new TaxCalculator(List.of(taxRule));
+
+        assertThrows(
+                IllegalStateException.class,
+                () -> calculator.calculateTax(grossPay)
+        );
+    }
+
+    @Test
+    void rejectsNegativeCalculatedDecimalTax() {
+        BigDecimal grossPay = new BigDecimal("800.00");
+
+        TaxRule taxRule = mock(TaxRule.class);
+
+        when(taxRule.appliesTo(grossPay)).thenReturn(true);
+        when(taxRule.calculateTax(grossPay))
+                .thenReturn(new BigDecimal("-0.01"));
+
+        TaxCalculator calculator = new TaxCalculator(List.of(taxRule));
+
+        assertThrows(
+                IllegalStateException.class,
+                () -> calculator.calculateTax(grossPay)
+        );
+    }
+
+    @Test
+    void rejectsDecimalTaxGreaterThanGrossPay() {
+        BigDecimal grossPay = new BigDecimal("800.00");
+
+        TaxRule taxRule = mock(TaxRule.class);
+
+        when(taxRule.appliesTo(grossPay)).thenReturn(true);
+        when(taxRule.calculateTax(grossPay))
+                .thenReturn(new BigDecimal("800.01"));
+
+        TaxCalculator calculator = new TaxCalculator(List.of(taxRule));
+
+        assertThrows(
+                IllegalStateException.class,
+                () -> calculator.calculateTax(grossPay)
+        );
+    }
+
+    @Test
+    void calculatesDecimalTaxAtBandBoundary() {
+        TaxCalculator calculator = createCalculator();
+
+        assertEquals(
+                new BigDecimal("150.00"),
+                calculator.calculateTax(new BigDecimal("1000.00"))
+        );
     }
 }

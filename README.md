@@ -129,8 +129,5 @@ The project includes the following supporting documents:
 - [Analysis Check-In](Analysis.md) — Identified code smells, SOLID violations, AI-generated test weaknesses, and their severity.
 - [Refactoring Rationale](RATIONALE.md) — Explains architectural decisions, exception handling, tax extensibility, test improvements, and remaining limitations.
 
-## Known Limitations
-
-Monetary calculations currently use `double` without an explicit currency rounding policy. Before production use, monetary precision and rounding requirements should be confirmed, with consideration given to `BigDecimal` or integer minor units.
 
 The existing tax rates preserve the starter project's calculation rules and should not be interpreted as verified statutory tax rates.
