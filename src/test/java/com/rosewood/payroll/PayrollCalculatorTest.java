@@ -71,30 +71,6 @@ class PayrollCalculatorTest {
 
 
     private PayrollCalculator createCalculator() {
-        EmployeeRepository employeeRepository =
-                new InMemoryEmployeeRepository();
-
-        GrossPayCalculator grossPayCalculator =
-                new GrossPayCalculator();
-
-        TaxCalculator taxCalculator = new TaxCalculator(
-                List.of(
-                        new PercentageTaxRule(
-                                Double.NEGATIVE_INFINITY, 1000, 0.05
-                        ),
-                        new PercentageTaxRule(
-                                1000, 5000, 0.15
-                        ),
-                        new PercentageTaxRule(
-                                5000, Double.POSITIVE_INFINITY, 0.25
-                        )
-                )
-        );
-
-        return new PayrollCalculator(
-                employeeRepository,
-                grossPayCalculator,
-                taxCalculator
-        );
+        return PayrollTestFixtures.createPayrollCalculator();
     }
 }
