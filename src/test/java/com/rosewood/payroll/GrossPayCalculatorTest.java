@@ -109,4 +109,12 @@ class GrossPayCalculatorTest {
         );
     }
 
+    @Test
+    void acceptsZeroHourlyRate() {
+        GrossPayCalculator calculator = new GrossPayCalculator();
+
+        double grossPay = calculator.calculate(40, 0);
+
+        assertEquals(0.0, grossPay, 0.001);
+    }
 }

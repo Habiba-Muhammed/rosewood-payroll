@@ -219,4 +219,44 @@ class TaxCalculatorTest {
                 () -> calculator.calculateTax(800.0)
         );
     }
+
+    @Test
+    void acceptsZeroGrossPay() {
+        TaxCalculator calculator = createCalculator();
+
+        double taxAmount = calculator.calculateTax(0);
+
+        assertEquals(0.0, taxAmount, 0.001);
+    }
+
+    @Test
+    void acceptsZeroPercentTaxRate() {
+        TaxCalculator calculator = new TaxCalculator(
+                List.of(
+                        new PercentageTaxRule(
+                                0, Double.POSITIVE_INFINITY, 0.0
+                        )
+                )
+        );
+
+        double taxAmount = calculator.calculateTax(800);
+
+        assertEquals(0.0, taxAmount, 0.001);
+    }
+
+    @Test
+    void acceptsHundredPercentTaxRate() {
+        TaxCalculator calculator = new TaxCalculator(
+                List.of(
+                        new PercentageTaxRule(
+                                0, Double.POSITIVE_INFINITY, 1.0
+                        )
+                )
+        );
+
+        double taxAmount = calculator.calculateTax(800);
+
+        assertEquals(800.0, taxAmount, 0.001);
+    }
+
 }
