@@ -84,9 +84,3 @@ The remaining surviving covered mutation changes the overtime condition from `> 
 This demonstrates why coverage percentages alone are insufficient: tests must also verify meaningful outcomes and detect incorrect calculations.
 
 Detailed JaCoCo and PIT results are provided in the [README](README.md).
-
-## 7. Remaining Limitations
-
-Although the refactoring significantly improves maintainability and testability, monetary calculations still use `double` without an explicit currency-rounding policy.
-
-Before production use, business rules and rounding requirements should be confirmed. Using `BigDecimal` or integer minor units should also be considered to reduce financial precision risks.
