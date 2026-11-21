@@ -79,8 +79,4 @@ JaCoCo confirmed that the tests exercise every branch in the payroll implementat
 
 Mutation testing initially exposed weaknesses around boundary values, including zero hourly rates, zero gross pay, and tax rates at their permitted limits. Adding targeted tests improved mutation coverage and test strength.
 
-The remaining surviving covered mutation changes the overtime condition from `> 40` to `>= 40`. Since the overtime premium is zero at exactly 40 hours, this mutation does not change the observable result and is considered equivalent for the current implementation.
-
-This demonstrates why coverage percentages alone are insufficient: tests must also verify meaningful outcomes and detect incorrect calculations.
-
 Detailed JaCoCo and PIT results are provided in the [README](README.md).
